@@ -250,7 +250,7 @@
       position: fixed;
       z-index: 1000;
       top: 0;
-      right: 0;
+      left: 0;
       width: 0;
       height: 100vh;
       background: none;
@@ -266,8 +266,8 @@
     .settings-panel {
       background: var(--container-bg);
       color: var(--text-color);
-      border-radius: 0 0 0 16px;
-      box-shadow: -4px 0 32px var(--shadow-color);
+      border-radius: 0 16px 16px 0;
+      box-shadow: 4px 0 32px var(--shadow-color);
       padding: 32px 28px 24px 28px;
       min-width: 320px;
       max-width: 360px;
@@ -278,8 +278,8 @@
       gap: 18px;
       position: absolute;
       top: 0;
-      right: 0;
-      transform: translateX(100%);
+      left: 0;
+      transform: translateX(-100%);
       transition: transform 0.3s cubic-bezier(.4,0,.2,1);
     }
     .settings-modal.active .settings-panel {
@@ -453,6 +453,32 @@
       background: #0e7c5a;
     }
 
+    .auth-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-left: auto;
+    }
+    .auth-btn {
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 4px 12px;
+      border-radius: 6px;
+      transition: background 0.2s, color 0.2s;
+    }
+    #loginBtn.auth-btn:hover {
+      background: #2563eb;
+      color: #fff;
+    }
+    #signupBtn.auth-btn:hover {
+      background: #22c55e;
+      color: #fff;
+    }
+
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -463,6 +489,10 @@
   <div class="top-bar">
     <button class="settings-gear" id="openChatSidebar" title="Chats" aria-label="Chats" style="margin-right:8px;">💬</button>
     <button class="settings-gear" id="openSettings" title="Settings" aria-label="Settings">⚙️</button>
+    <div class="auth-buttons">
+      <button class="auth-btn" id="loginBtn">Log In</button>
+      <button class="auth-btn" id="signupBtn">Sign Up</button>
+    </div>
   </div>
   <div class="chat-container">
     <div class="chat-header">BARMITZVAPROJECT - ALPHA</div>
@@ -735,11 +765,16 @@
       chatData[name] = [];
       currentChat = name;
       renderChatList();
-      renderMessages();
+    renderMessages();
     };
 
     openChatSidebar.onclick = () => {
-      chatSidebarModal.classList.add('active');
+      if (chatSidebarModal.classList.contains('active')) {
+        chatSidebarModal.classList.remove('active');
+      } else {
+        chatSidebarModal.classList.add('active');
+        settingsModal.classList.remove('active');
+      }
     };
     closeChatSidebar.onclick = () => {
       chatSidebarModal.classList.remove('active');
@@ -808,10 +843,26 @@
     loadSettings();
 
     openSettings.onclick = () => {
-      settingsModal.classList.add('active');
+      if (settingsModal.classList.contains('active')) {
+        settingsModal.classList.remove('active');
+      } else {
+        settingsModal.classList.add('active');
+        chatSidebarModal.classList.remove('active');
+      }
     };
     closeSettings.onclick = () => {
       settingsModal.classList.remove('active');
+    };
+    openChatSidebar.onclick = () => {
+      if (chatSidebarModal.classList.contains('active')) {
+        chatSidebarModal.classList.remove('active');
+      } else {
+        chatSidebarModal.classList.add('active');
+        settingsModal.classList.remove('active');
+      }
+    };
+    closeChatSidebar.onclick = () => {
+      chatSidebarModal.classList.remove('active');
     };
     // Remove click-outside-to-close for sidebar
     // settingsModal.onclick = (e) => {
