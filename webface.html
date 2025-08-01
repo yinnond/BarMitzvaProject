@@ -179,6 +179,82 @@
       margin-top: 50px;
     }
 
+    .settings-gear {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      color: var(--primary-color);
+      margin-left: 8px;
+      transition: color 0.2s;
+    }
+    .settings-gear:hover {
+      color: #0e7c5a;
+    }
+    .settings-modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.3);
+      justify-content: center;
+      align-items: center;
+    }
+    .settings-modal.active {
+      display: flex;
+    }
+    .settings-panel {
+      background: var(--container-bg);
+      color: var(--text-color);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px var(--shadow-color);
+      padding: 32px 28px 24px 28px;
+      min-width: 320px;
+      max-width: 90vw;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: relative;
+    }
+    .settings-panel h2 {
+      margin-bottom: 10px;
+      font-size: 20px;
+      text-align: center;
+    }
+    .settings-panel label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .settings-panel input[type="color"] {
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: none;
+      cursor: pointer;
+    }
+    .settings-close {
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: var(--text-color);
+      cursor: pointer;
+    }
+    .wallpaper-preview {
+      width: 100%;
+      height: 40px;
+      border-radius: 8px;
+      margin-top: 4px;
+      background-size: cover;
+      background-position: center;
+      border: 1px solid #ccc;
+    }
+
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -188,7 +264,7 @@
 <body>
   <div class="top-bar">
     <select id="chatSelect" class="chat-selector"></select>
-    <button class="settings-button" onclick="toggleTheme()">Toggle Theme</button>
+    <button class="settings-gear" id="openSettings" title="Settings" aria-label="Settings">⚙️</button>
   </div>
   <div class="chat-container">
     <div class="chat-header">BARMITZVAPROJECT - ALPHA</div>
@@ -196,6 +272,33 @@
     <div class="chat-input-container">
       <input type="text" id="messageInput" class="chat-input" placeholder="Type a message..." maxlength="500">
       <button class="send-button" id="sendButton" disabled>Send</button>
+    </div>
+  </div>
+  <div class="settings-modal" id="settingsModal">
+    <div class="settings-panel">
+      <button class="settings-close" id="closeSettings" title="Close">&times;</button>
+      <h2>Settings</h2>
+      <label>
+        Theme:
+        <select id="themeSelect">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+      <label>
+        Wallpaper:
+        <input type="color" id="wallpaperColor" title="Pick a background color" />
+        <input type="file" id="wallpaperFile" accept="image/*" style="margin-left:8px;" />
+      </label>
+      <div class="wallpaper-preview" id="wallpaperPreview"></div>
+      <label>
+        User Chat Color:
+        <input type="color" id="userColor" />
+      </label>
+      <label>
+        Other Chat Color:
+        <input type="color" id="otherColor" />
+      </label>
     </div>
   </div>
 
@@ -268,6 +371,107 @@
     messageInput.addEventListener("input", () => sendButton.disabled = !messageInput.value.trim());
     sendButton.addEventListener("click", sendMessage);
     messageInput.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
+
+    // Settings panel logic
+    const openSettings = document.getElementById('openSettings');
+    const closeSettings = document.getElementById('closeSettings');
+    const settingsModal = document.getElementById('settingsModal');
+    const themeSelect = document.getElementById('themeSelect');
+    const wallpaperColor = document.getElementById('wallpaperColor');
+    const wallpaperFile = document.getElementById('wallpaperFile');
+    const wallpaperPreview = document.getElementById('wallpaperPreview');
+    const userColor = document.getElementById('userColor');
+    const otherColor = document.getElementById('otherColor');
+
+    // Load settings from localStorage
+    function loadSettings() {
+      const theme = localStorage.getItem('theme');
+      if (theme === 'dark') {
+        document.body.classList.add('dark');
+        themeSelect.value = 'dark';
+      } else {
+        document.body.classList.remove('dark');
+        themeSelect.value = 'light';
+      }
+      const wallColor = localStorage.getItem('wallpaperColor');
+      if (wallColor) {
+        document.body.style.backgroundImage = '';
+        document.body.style.backgroundColor = wallColor;
+        wallpaperColor.value = wallColor;
+        wallpaperPreview.style.background = wallColor;
+      } else {
+        document.body.style.backgroundColor = '';
+        wallpaperPreview.style.background = '';
+      }
+      const wallImg = localStorage.getItem('wallpaperImage');
+      if (wallImg) {
+        document.body.style.backgroundImage = `url('${wallImg}')`;
+        wallpaperPreview.style.backgroundImage = `url('${wallImg}')`;
+      } else {
+        document.body.style.backgroundImage = '';
+        wallpaperPreview.style.backgroundImage = '';
+      }
+      const userCol = localStorage.getItem('userColor');
+      if (userCol) {
+        document.documentElement.style.setProperty('--user-msg-bg', userCol);
+        userColor.value = userCol;
+      }
+      const otherCol = localStorage.getItem('otherColor');
+      if (otherCol) {
+        document.documentElement.style.setProperty('--other-msg-bg', otherCol);
+        otherColor.value = otherCol;
+      }
+    }
+    loadSettings();
+
+    openSettings.onclick = () => {
+      settingsModal.classList.add('active');
+    };
+    closeSettings.onclick = () => {
+      settingsModal.classList.remove('active');
+    };
+    settingsModal.onclick = (e) => {
+      if (e.target === settingsModal) settingsModal.classList.remove('active');
+    };
+
+    themeSelect.onchange = () => {
+      if (themeSelect.value === 'dark') {
+        document.body.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.body.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    };
+    wallpaperColor.oninput = () => {
+      document.body.style.backgroundImage = '';
+      document.body.style.backgroundColor = wallpaperColor.value;
+      wallpaperPreview.style.background = wallpaperColor.value;
+      wallpaperPreview.style.backgroundImage = '';
+      localStorage.setItem('wallpaperColor', wallpaperColor.value);
+      localStorage.removeItem('wallpaperImage');
+    };
+    wallpaperFile.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        document.body.style.backgroundImage = `url('${ev.target.result}')`;
+        wallpaperPreview.style.backgroundImage = `url('${ev.target.result}')`;
+        wallpaperPreview.style.background = '';
+        localStorage.setItem('wallpaperImage', ev.target.result);
+        localStorage.removeItem('wallpaperColor');
+      };
+      reader.readAsDataURL(file);
+    };
+    userColor.oninput = () => {
+      document.documentElement.style.setProperty('--user-msg-bg', userColor.value);
+      localStorage.setItem('userColor', userColor.value);
+    };
+    otherColor.oninput = () => {
+      document.documentElement.style.setProperty('--other-msg-bg', otherColor.value);
+      localStorage.setItem('otherColor', otherColor.value);
+    };
   </script>
 </body>
 </html>
