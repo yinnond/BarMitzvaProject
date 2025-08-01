@@ -69,6 +69,105 @@
       flex-direction: column;
       overflow: hidden;
       transition: background 0.3s ease;
+      display: none;
+    }
+    .chat-container.show {
+      display: flex;
+    }
+    .landing-page {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, var(--primary-color) 0%, #0e7c5a 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    .landing-page.hidden {
+      display: none;
+    }
+    .landing-title {
+      font-size: 3.5rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .landing-subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 40px;
+      opacity: 0.9;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+    .landing-images {
+      display: flex;
+      gap: 20px;
+      margin: 30px 0;
+      justify-content: center;
+      align-items: center;
+    }
+    .landing-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+    }
+    .landing-image:hover {
+      transform: scale(1.1);
+    }
+    .landing-buttons {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .landing-btn {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 2px solid rgba(255,255,255,0.3);
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    .landing-btn-take-a-look {
+      background: rgba(255, 238, 0, 0.63);
+      color: white;
+      border: 2px solid rgba(255,255,255,0.3);
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    .landing-btn:hover {
+      background: rgba(255,255,255,0.3);
+      border-color: rgba(255,255,255,0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    .landing-btn.primary {
+      background: rgba(255,255,255,0.9);
+      color: var(--primary-color);
+      border-color: white;
+    }
+    .landing-btn.primary:hover {
+      background: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
 
     .chat-header {
@@ -486,12 +585,31 @@
   </style>
 </head>
 <body>
+  <div class="landing-page" id="landingPage">
+    <h1 class="landing-title">BARMITZVAPROJECT</h1>
+    <p class="landing-subtitle">
+      !שלום וברוכים הבאים לאתר שלנו
+      <br>
+      <br>
+      באתר זה תוכלו לתרגל את המשפטים שתקראו מספר התורה בזמן המצווה
+      <br>
+      <br>
+      הרשמו פה למטה או הכנסו למשתמשים קיימים
+
+    </p>
+    <div class="landing-images">
+    </div>
+    <div class="landing-buttons">
+      <button class="landing-btn" id="landingLoginBtn">Log In</button>
+      <button class="landing-btn primary" id="landingSignupBtn">Sign Up</button>
+      <button class="landing-btn" id="landingGuestBtn">Be Guest</button>
+    </div>
+  </div>
   <div class="top-bar">
     <button class="settings-gear" id="openChatSidebar" title="Chats" aria-label="Chats" style="margin-right:8px;">💬</button>
     <button class="settings-gear" id="openSettings" title="Settings" aria-label="Settings">⚙️</button>
-    <div class="auth-buttons">
-      <button class="auth-btn" id="loginBtn">Log In</button>
-      <button class="auth-btn" id="signupBtn">Sign Up</button>
+    <div class="guest-info" id="guestInfo" style="display:none;color:var(--primary-color);font-weight:bold;margin-left:auto;">
+      Logged in as: Guest
     </div>
   </div>
   <div class="chat-container">
@@ -548,8 +666,9 @@
     const chatMessages = document.getElementById("chatMessages");
 
     const defaultChats = ["chat-1"];
-    const chatData = { "chat-1": [{ text: `Welcome to BARMITZVAPROJECT - ALPHA, ask anything!`, isUser: false, time: formatTime() }] };
+    const chatData = { "chat-1": [] };
     let currentChat = "chat-1";
+    let currentUser = "Guest";
 
     function formatTime() {
       const now = new Date();
@@ -559,7 +678,7 @@
     function renderMessages() {
       const messages = chatData[currentChat] || [];
       if (messages.length === 0) {
-        chatMessages.innerHTML = '<div class="empty-state">Start a conversation...</div>';
+        chatMessages.innerHTML = `<div class="empty-state">Welcome ${currentUser} to BARMITZVAPROJECT - ALPHA, ask anything!</div>`;
         return;
       }
       chatMessages.innerHTML = messages.map((msg, index) => {
@@ -922,6 +1041,37 @@
       renderMessages();
       loadSettings();
     };
+
+    // Landing page logic
+    const landingPage = document.getElementById('landingPage');
+    const landingLoginBtn = document.getElementById('landingLoginBtn');
+    const landingSignupBtn = document.getElementById('landingSignupBtn');
+    const landingGuestBtn = document.getElementById('landingGuestBtn');
+    const chatContainer = document.querySelector('.chat-container');
+    const guestInfo = document.getElementById('guestInfo');
+
+    function showChat() {
+      landingPage.classList.add('hidden');
+      chatContainer.classList.add('show');
+      currentUser = "User";
+      if (chatData[currentChat].length === 0) {
+        renderMessages();
+      }
+    }
+
+    function showChatAsGuest() {
+      landingPage.classList.add('hidden');
+      chatContainer.classList.add('show');
+      guestInfo.style.display = 'block';
+      currentUser = "Guest";
+      if (chatData[currentChat].length === 0) {
+        renderMessages();
+      }
+    }
+
+    landingLoginBtn.onclick = showChat;
+    landingSignupBtn.onclick = showChat;
+    landingGuestBtn.onclick = showChatAsGuest;
   </script>
 </body>
 </html>
