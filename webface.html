@@ -1,0 +1,2513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BARMITZVAPROJECT - ALPHA</title>
+  <style>
+    :root {
+      --bg-color: #f5f5f5;
+      --container-bg: #ffffff;
+      --text-color: #222222;
+      --user-msg-bg: #d1fae5;
+      --other-msg-bg: #e5e7eb;
+      --input-bg: #ffffff;
+      --primary-color: #10b981;
+      --shadow-color: rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark {
+      --bg-color: #1e1e1e;
+      --container-bg: #2a2a2a;
+      --text-color: #f5f5f5;
+      --user-msg-bg: #065f46;
+      --other-msg-bg: #374151;
+      --input-bg: #1f2937;
+      --primary-color: #34d399;
+      --shadow-color: rgba(0, 0, 0, 0.6);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .top-bar {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .chat-selector {
+      flex-grow: 1;
+      margin-right: 10px;
+    }
+
+    .chat-container {
+      background: var(--container-bg);
+      width: 100%;
+      max-width: 600px;
+      height: 600px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px var(--shadow-color);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: background 0.3s ease;
+      display: none;
+    }
+    .chat-container.show {
+      display: flex;
+    }
+    .landing-page {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4facfe 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 2000;
+      color: white;
+      text-align: center;
+      padding: 0;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+    .landing-content {
+      width: 100%;
+      max-width: 1200px;
+      padding: 100px 20px 200px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 120px;
+    }
+    .content-section {
+      width: 100%;
+      max-width: 900px;
+      padding: 60px 40px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 25px;
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      opacity: 0;
+      transform: translateY(100px);
+      transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .content-section.animate {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .section-title {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-align: center;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      background: linear-gradient(45deg, #fff, #e6f3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .section-content {
+      font-size: 1.3rem;
+      line-height: 1.8;
+      text-align: center;
+      opacity: 0.9;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    .feature-card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 15px;
+      padding: 30px 20px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: all 0.3s ease;
+    }
+    .feature-card {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .feature-card.animate {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255,255,255,0.15);
+    }
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      display: block;
+    }
+    .feature-title {
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .feature-description {
+      font-size: 1rem;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    .landing-page.hidden {
+      display: none;
+    }
+    .landing-title {
+      font-size: 4rem;
+      font-weight: bold;
+      margin-bottom: 30px;
+      text-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      background: linear-gradient(45deg, #fff, #f0f8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: titleGlow 3s ease-in-out infinite alternate;
+    }
+    .landing-subtitle {
+      font-size: 1.6rem;
+      max-width: 700px;
+      line-height: 1.8;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      opacity: 0;
+      transform: translateY(80px);
+      transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .landing-subtitle.animate {
+      opacity: 0.95;
+      transform: translateY(0);
+    }
+    @keyframes titleGlow {
+      from { filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
+      to { filter: drop-shadow(0 0 20px rgba(255,255,255,0.6)); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 0.95; transform: translateY(0); }
+    }
+    .bible-section {
+      width: 100%;
+      max-width: 800px;
+      padding: 40px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      opacity: 0;
+      transform: translateY(100px);
+      transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .bible-section.animate {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .bible-section h2 {
+      font-size: 2.2rem;
+      margin-bottom: 25px;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .bible-images {
+      display: flex;
+      gap: 25px;
+      margin: 30px 0;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .bible-image-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(60px) scale(0.7);
+      transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .bible-image-container.animate {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .bible-image {
+      width: 100px;
+      height: 100px;
+      border-radius: 15px;
+      object-fit: cover;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      transition: all 0.4s ease;
+      border: 3px solid rgba(255,255,255,0.3);
+    }
+    .bible-image:hover {
+      transform: scale(1.15) rotate(5deg);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      border-color: rgba(255,255,255,0.6);
+    }
+    .bible-description {
+      font-size: 0.9rem;
+      text-align: center;
+      max-width: 120px;
+      opacity: 0.9;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      line-height: 1.4;
+    }
+    @keyframes slideInFromBottom {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .landing-buttons {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      padding: 80px 40px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 30px;
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255,255,255,0.25);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      max-width: 600px;
+      width: 100%;
+      opacity: 0;
+      transform: translateY(150px) scale(0.7);
+      transition: all 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .landing-buttons.animate {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .finale-title {
+      font-size: 3rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+      background: linear-gradient(45deg, #fff, #e6f3ff, #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      animation: titlePulse 3s ease-in-out infinite;
+    }
+    .finale-subtitle {
+      font-size: 1.4rem;
+      text-align: center;
+      margin-bottom: 40px;
+      opacity: 0.9;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      line-height: 1.6;
+    }
+    .buttons-container {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    @keyframes titlePulse {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(255,255,255,0.3)); }
+      50% { filter: drop-shadow(0 0 30px rgba(255,255,255,0.6)); }
+    }
+    .landing-btn {
+      background: rgba(255,255,255,0.15);
+      color: white;
+      border: 3px solid rgba(255,255,255,0.4);
+      padding: 25px 50px;
+      border-radius: 60px;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(15px);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+      min-width: 200px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    .landing-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    .landing-btn:hover::before {
+      left: 100%;
+    }
+    .landing-btn:hover {
+      background: rgba(255,255,255,0.25);
+      border-color: rgba(255,255,255,0.7);
+      transform: translateY(-5px) scale(1.08);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    }
+    .landing-btn.primary {
+      background: linear-gradient(45deg, #ff6b6b, #ffa500, #ff6b6b);
+      background-size: 200% 200%;
+      color: white;
+      border-color: rgba(255,255,255,0.7);
+      box-shadow: 0 10px 30px rgba(255,107,107,0.5);
+      animation: gradientShift 3s ease-in-out infinite;
+    }
+    .landing-btn.primary:hover {
+      background: linear-gradient(45deg, #ff5252, #ff9800, #ff5252);
+      transform: translateY(-5px) scale(1.08);
+      box-shadow: 0 20px 50px rgba(255,107,107,0.7);
+    }
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .chat-header {
+      background: var(--primary-color);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.4;
+      animation: slideIn 0.3s ease-out;
+      word-wrap: break-word;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .message.user:hover .msg-actions-btn {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .msg-actions-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #888;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 2;
+    }
+    .msg-actions-menu {
+      position: absolute;
+      top: 28px;
+      right: 8px;
+      background: var(--container-bg);
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px var(--shadow-color);
+      min-width: 80px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      padding: 4px 0;
+    }
+    .msg-actions-menu button {
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-size: 14px;
+      padding: 8px 16px;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .msg-actions-menu button:hover {
+      background: #e0f7ef;
+    }
+    .msg-edit-input {
+      width: 90%;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 6px 10px;
+      margin-bottom: 2px;
+    }
+
+    .message.user {
+      background: var(--user-msg-bg);
+      color: black;
+      align-self: flex-end;
+    }
+
+    .message.other {
+      background: var(--other-msg-bg);
+      color: black;
+      align-self: flex-start;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 2px;
+      right: 8px;
+      background: transparent;
+      border: none;
+      color: red;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .message-time {
+      font-size: 11px;
+      opacity: 0.6;
+      margin-top: 4px;
+    }
+
+    .chat-input-container {
+      padding: 20px;
+      display: flex;
+      gap: 10px;
+      background: var(--input-bg);
+      border-top: 1px solid #ccc;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 20px;
+      border: 2px solid #ccc;
+      outline: none;
+      background: var(--input-bg);
+      color: var(--text-color);
+    }
+
+    .send-button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .send-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .settings-button {
+      padding: 8px 12px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #aaa;
+      font-style: italic;
+      margin-top: 50px;
+    }
+
+    .settings-gear {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      color: var(--primary-color);
+      margin-left: 8px;
+      transition: color 0.2s;
+    }
+    .settings-gear:hover {
+      color: #0e7c5a;
+    }
+    .settings-modal {
+      display: block;
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 100vh;
+      background: none;
+      overflow: hidden;
+      transition: width 0.3s cubic-bezier(.4,0,.2,1);
+      pointer-events: none;
+    }
+    .settings-modal.active {
+      width: 360px;
+      background: rgba(0,0,0,0.08);
+      pointer-events: auto;
+    }
+    .settings-panel {
+      background: var(--container-bg);
+      color: var(--text-color);
+      border-radius: 0 16px 16px 0;
+      box-shadow: 4px 0 32px var(--shadow-color);
+      padding: 32px 28px 24px 28px;
+      min-width: 320px;
+      max-width: 360px;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+    }
+    .settings-modal.active .settings-panel {
+      transform: translateX(0);
+    }
+    .settings-panel h2 {
+      margin-bottom: 10px;
+      font-size: 20px;
+      text-align: center;
+    }
+    .settings-panel label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .settings-panel input[type="color"] {
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: none;
+      cursor: pointer;
+    }
+    .settings-close {
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: var(--text-color);
+      cursor: pointer;
+      z-index: 2;
+    }
+    .wallpaper-section {
+      margin: 16px 0;
+      padding: 16px;
+      background: rgba(0,0,0,0.02);
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+    .wallpaper-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .wallpaper-option {
+      display: flex;
+      align-items: center;
+    }
+    .wallpaper-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.02);
+      border: 1px solid rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+    }
+    .wallpaper-label:hover {
+      background: rgba(0,0,0,0.05);
+      border-color: var(--primary-color);
+    }
+    .wallpaper-label-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+    .wallpaper-color-input {
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: none;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+    .wallpaper-color-input:hover {
+      transform: scale(1.05);
+    }
+    .wallpaper-file-input {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: var(--input-bg);
+      color: var(--text-color);
+      font-size: 14px;
+      cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+    .wallpaper-file-input:hover {
+      border-color: var(--primary-color);
+    }
+    .wallpaper-preview-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .wallpaper-preview-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+    .wallpaper-preview {
+      width: 100%;
+      height: 60px;
+      border-radius: 12px;
+      background-size: cover;
+      background-position: center;
+      border: 2px solid rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+    }
+    .wallpaper-preview:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+
+    .chat-sidebar-modal {
+      display: block;
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 100vh;
+      background: none;
+      overflow: hidden;
+      transition: width 0.3s cubic-bezier(.4,0,.2,1);
+      pointer-events: none;
+    }
+    .chat-sidebar-modal.active {
+      width: 320px;
+      background: rgba(0,0,0,0.08);
+      pointer-events: auto;
+    }
+    .chat-sidebar-panel {
+      background: var(--container-bg);
+      color: var(--text-color);
+      border-radius: 0 16px 16px 0;
+      box-shadow: 4px 0 32px var(--shadow-color);
+      padding: 28px 18px 18px 18px;
+      min-width: 260px;
+      max-width: 320px;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+    }
+    .chat-sidebar-modal.active .chat-sidebar-panel {
+      transform: translateX(0);
+    }
+    .chat-sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .chat-sidebar-title {
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .chat-sidebar-close {
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: var(--text-color);
+      cursor: pointer;
+    }
+    .chat-list {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .chat-list-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: none;
+      transition: background 0.2s;
+      position: relative;
+    }
+    .chat-list-item.selected {
+      background: var(--primary-color);
+      color: white;
+    }
+    .chat-list-item:hover:not(.selected) {
+      background: #e0f7ef;
+    }
+    .chat-list-item input {
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 2px 6px;
+      width: 80px;
+    }
+    .chat-list-icon {
+      font-size: 18px;
+      opacity: 0.7;
+    }
+    .chat-list-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 4px;
+    }
+    .chat-list-action-btn {
+      background: none;
+      border: none;
+      color: inherit;
+      font-size: 16px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .chat-list-action-btn:hover {
+      opacity: 1;
+      color: var(--primary-color);
+    }
+    .chat-add-btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      padding: 6px 12px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: background 0.2s;
+    }
+    .chat-add-btn:hover {
+      background: #0e7c5a;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-left: auto;
+    }
+    .auth-btn {
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 4px 12px;
+      border-radius: 6px;
+      transition: background 0.2s, color 0.2s;
+    }
+    #loginBtn.auth-btn:hover {
+      background: #2563eb;
+      color: #fff;
+    }
+    #signupBtn.auth-btn:hover {
+      background: #22c55e;
+      color: #fff;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Transition animations */
+    .transition-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4facfe 100%);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    .transition-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .transition-content {
+      text-align: center;
+      color: white;
+      transform: scale(0.8) translateY(50px);
+      transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .transition-overlay.active .transition-content {
+      transform: scale(1) translateY(0);
+    }
+    .transition-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      animation: bounce 1s ease-in-out infinite;
+    }
+    .transition-text {
+      font-size: 1.8rem;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      margin-bottom: 10px;
+    }
+    .transition-subtext {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+    .landing-page.transitioning {
+      transform: scale(0.95);
+      opacity: 0.7;
+      transition: all 0.5s ease;
+    }
+    .chat-container.transitioning {
+      transform: scale(1.05);
+      opacity: 0;
+      transition: all 0.5s ease;
+    }
+    .chat-container.transitioning.show {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    /* Language Selector */
+    .language-selector {
+      position: relative;
+      display: inline-block;
+    }
+    .language-btn {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 2px solid rgba(255,255,255,0.3);
+      padding: 8px 15px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .language-btn:hover {
+      background: rgba(255,255,255,0.2);
+      border-color: rgba(255,255,255,0.5);
+      transform: translateY(-2px);
+    }
+    .language-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--container-bg);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      min-width: 150px;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(15px);
+    }
+    .language-dropdown.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .language-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 15px;
+      color: var(--text-color);
+      cursor: pointer;
+      transition: background 0.2s ease;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    .language-option:last-child {
+      border-bottom: none;
+    }
+    .language-option:hover {
+      background: rgba(0,0,0,0.05);
+    }
+    .language-option.active {
+      background: var(--primary-color);
+      color: white;
+    }
+    .language-flag {
+      font-size: 18px;
+    }
+    .language-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .landing-language-selector {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <div class="landing-page" id="landingPage">
+    <!-- Landing Page Language Selector -->
+    <div class="landing-language-selector">
+      <div class="language-selector">
+        <button class="language-btn" id="landingLanguageBtn">
+          <span class="language-flag" id="landingCurrentFlag">🇺🇸</span>
+          <span id="landingCurrentLanguage">English</span>
+          <span>▼</span>
+        </button>
+        <div class="language-dropdown" id="landingLanguageDropdown">
+          <div class="language-option active" data-lang="en">
+            <span class="language-flag">🇺🇸</span>
+            <span class="language-name">English</span>
+          </div>
+          <div class="language-option" data-lang="he">
+            <span class="language-flag">🇮🇱</span>
+            <span class="language-name">עברית</span>
+          </div>
+          <div class="language-option" data-lang="es">
+            <span class="language-flag">🇪🇸</span>
+            <span class="language-name">Español</span>
+          </div>
+          <div class="language-option" data-lang="zh">
+            <span class="language-flag">🇨🇳</span>
+            <span class="language-name">中文</span>
+          </div>
+          <div class="language-option" data-lang="ja">
+            <span class="language-flag">🇯🇵</span>
+            <span class="language-name">日本語</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="landing-content">
+      <div class="hero-section">
+    <h1 class="landing-title">BARMITZVAPROJECT</h1>
+    <p class="landing-subtitle">
+      !שלום וברוכים הבאים לאתר שלנו
+      <br>
+      <br>
+      באתר זה תוכלו לתרגל את המשפטים שתקראו מספר התורה בזמן המצווה
+      <br>
+      <br>
+      הרשמו פה למטה או הכנסו למשתמשים קיימים
+        </p>
+      </div>
+      
+      <div class="bible-section">
+        <h2>📖 Discover the Torah</h2>
+        <div class="bible-images">
+          <div class="bible-image-container">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjOEI0NTAwIi8+CjxwYXRoIGQ9Ik0yMCAyMEg4MFY4MEgyMFYyMFoiIGZpbGw9IiNGRkZGRkYiLz4KPHN2ZyB4PSIyNSIgeT0iMjUiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTI1IDVMMzAgMTVIMzVMMzAgMjVMMzUgMzVMMzAgNDVMMjUgNDBMMjAgNDVMMTUgMzVMMjAgMjVMMTUgMTVMMjAgNUwyNSA1WiIgZmlsbD0iI0ZGRkZGRiIvPgo8L3N2Zz4KPC9zdmc+" alt="Torah Scroll" class="bible-image">
+            <div class="bible-description">Torah Scroll<br>Ancient Wisdom</div>
+          </div>
+          <div class="bible-image-container">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkY2QjAwIi8+CjxwYXRoIGQ9Ik0yMCAyMEg4MFY4MEgyMFYyMFoiIGZpbGw9IiNGRkZGRkYiLz4KPHN2ZyB4PSIyNSIgeT0iMjUiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTI1IDEwQzMwIDEwIDM1IDE1IDM1IDIwVjMwQzM1IDM1IDMwIDQwIDI1IDQwQzIwIDQwIDE1IDM1IDE1IDMwVjIwQzE1IDE1IDIwIDEwIDI1IDEwWiIgZmlsbD0iI0ZGRkZGRiIvPgo8L3N2Zz4KPC9zdmc+" alt="Star of David" class="bible-image">
+            <div class="bible-description">Star of David<br>Sacred Symbol</div>
+          </div>
+          <div class="bible-image-container">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMDA4MDAwIi8+CjxwYXRoIGQ9Ik0yMCAyMEg4MFY4MEgyMFYyMFoiIGZpbGw9IiNGRkZGRkYiLz4KPHN2ZyB4PSIyNSIgeT0iMjUiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTI1IDVMMzAgMTVIMzVMMzAgMjVMMzUgMzVMMzAgNDVMMjUgNDBMMjAgNDVMMTUgMzVMMjAgMjVMMTUgMTVMMjAgNUwyNSA1WiIgZmlsbD0iI0ZGRkZGRiIvPgo8L3N2Zz4KPC9zdmc+" alt="Menorah" class="bible-image">
+            <div class="bible-description">Menorah<br>Divine Light</div>
+          </div>
+          <div class="bible-image-container">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjODAwMDgwIi8+CjxwYXRoIGQ9Ik0yMCAyMEg4MFY4MEgyMFYyMFoiIGZpbGw9IiNGRkZGRkYiLz4KPHN2ZyB4PSIyNSIgeT0iMjUiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTI1IDEwQzMwIDEwIDM1IDE1IDM1IDIwVjMwQzM1IDM1IDMwIDQwIDI1IDQwQzIwIDQwIDE1IDM1IDE1IDMwVjIwQzE1IDE1IDIwIDEwIDI1IDEwWiIgZmlsbD0iI0ZGRkZGRiIvPgo8L3N2Zz4KPC9zdmc+" alt="Hebrew Text" class="bible-image">
+            <div class="bible-description">Hebrew Text<br>Sacred Language</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h2 class="section-title">🎯 What is Bar Mitzvah?</h2>
+        <p class="section-content">
+          A Bar Mitzvah is a significant milestone in Jewish tradition, marking the transition from childhood to adulthood. 
+          At age 13, a young man becomes responsible for following Jewish commandments and traditions. 
+          This special ceremony involves reading from the Torah and leading parts of the service, 
+          symbolizing the beginning of their journey as a responsible member of the Jewish community.
+        </p>
+    </div>
+
+      <div class="content-section">
+        <h2 class="section-title">📚 Torah Reading Practice</h2>
+        <p class="section-content">
+          Our platform helps you master the art of Torah reading with interactive practice sessions. 
+          Learn the proper pronunciation, cantillation marks, and traditional melodies that bring 
+          the ancient Hebrew text to life. Practice makes perfect, and we're here to guide you 
+          every step of the way on your spiritual journey.
+        </p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <span class="feature-icon">🎵</span>
+            <h3 class="feature-title">Cantillation Practice</h3>
+            <p class="feature-description">Learn the traditional melodies and marks that guide Torah reading</p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">🔤</span>
+            <h3 class="feature-title">Hebrew Pronunciation</h3>
+            <p class="feature-description">Master proper Hebrew pronunciation with audio guidance</p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">📖</span>
+            <h3 class="feature-title">Torah Portions</h3>
+            <p class="feature-description">Practice with your specific Torah portion and weekly readings</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h2 class="section-title">🌟 The Significance of Torah</h2>
+        <p class="section-content">
+          The Torah is the foundation of Jewish life and learning. It contains the Five Books of Moses 
+          and serves as a guide for living a meaningful and ethical life. Reading from the Torah 
+          during your Bar Mitzvah connects you to thousands of years of Jewish tradition and wisdom. 
+          Each word carries deep meaning and spiritual significance.
+        </p>
+      </div>
+
+      <div class="content-section">
+        <h2 class="section-title">🎓 Your Learning Journey</h2>
+        <p class="section-content">
+          Every Bar Mitzvah student's journey is unique. Our platform adapts to your learning style 
+          and pace, providing personalized practice sessions, progress tracking, and encouragement 
+          along the way. Whether you're just beginning or perfecting your skills, we're here to 
+          support your growth and celebrate your achievements.
+        </p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <span class="feature-icon">📊</span>
+            <h3 class="feature-title">Progress Tracking</h3>
+            <p class="feature-description">Monitor your improvement with detailed progress reports</p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">🎯</span>
+            <h3 class="feature-title">Personalized Practice</h3>
+            <p class="feature-description">Customized exercises based on your specific needs</p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">🏆</span>
+            <h3 class="feature-title">Achievement System</h3>
+            <p class="feature-description">Earn badges and celebrate milestones in your learning</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h2 class="section-title">🤝 Community & Support</h2>
+        <p class="section-content">
+          You're not alone on this journey. Connect with other students, share experiences, 
+          and learn from each other. Our community features allow you to ask questions, 
+          get encouragement, and celebrate together as you prepare for this important milestone 
+          in your life.
+        </p>
+      </div>
+      
+    <div class="landing-buttons">
+        <h2 class="finale-title">🚀 Ready to Begin Your Journey?</h2>
+        <p class="finale-subtitle">
+          Join thousands of students who have successfully prepared for their Bar Mitzvah with our platform. 
+          Start your Torah reading practice today and make your special day truly memorable!
+        </p>
+        <div class="buttons-container">
+          <button class="landing-btn" id="landingLoginBtn">📚 Log In</button>
+          <button class="landing-btn primary" id="landingSignupBtn">✨ Sign Up</button>
+          <button class="landing-btn" id="landingGuestBtn">👀 Try as Guest</button>
+    </div>
+  </div>
+    </div>
+  </div>
+  
+  <!-- Transition Overlay -->
+  <div class="transition-overlay" id="transitionOverlay">
+    <div class="transition-content">
+      <div class="transition-icon">🚀</div>
+      <div class="transition-text">Welcome to Your Journey!</div>
+      <div class="transition-subtext">Preparing your Torah reading experience...</div>
+    </div>
+  </div>
+  
+  <div class="top-bar">
+    <button class="settings-gear" id="openChatSidebar" title="Chats" aria-label="Chats" style="margin-right:8px;">💬</button>
+    <button class="settings-gear" id="openSettings" title="Settings" aria-label="Settings">⚙️</button>
+    <div class="language-selector" style="margin-left:auto;margin-right:10px;">
+      <button class="language-btn" id="languageBtn">
+        <span class="language-flag" id="currentFlag">🇺🇸</span>
+        <span id="currentLanguage">English</span>
+        <span>▼</span>
+      </button>
+      <div class="language-dropdown" id="languageDropdown">
+        <div class="language-option active" data-lang="en">
+          <span class="language-flag">🇺🇸</span>
+          <span class="language-name">English</span>
+        </div>
+        <div class="language-option" data-lang="he">
+          <span class="language-flag">🇮🇱</span>
+          <span class="language-name">עברית</span>
+        </div>
+        <div class="language-option" data-lang="es">
+          <span class="language-flag">🇪🇸</span>
+          <span class="language-name">Español</span>
+        </div>
+        <div class="language-option" data-lang="zh">
+          <span class="language-flag">🇨🇳</span>
+          <span class="language-name">中文</span>
+        </div>
+        <div class="language-option" data-lang="ja">
+          <span class="language-flag">🇯🇵</span>
+          <span class="language-name">日本語</span>
+        </div>
+      </div>
+    </div>
+    <div class="guest-info" id="guestInfo" style="display:none;color:var(--primary-color);font-weight:bold;">
+      Logged in as: Guest
+    </div>
+  </div>
+  <div class="chat-container">
+    <div class="chat-header">BARMITZVAPROJECT - ALPHA</div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-container">
+      <input type="text" id="messageInput" class="chat-input" placeholder="Type a message..." maxlength="500">
+      <button class="send-button" id="sendButton" disabled>Send</button>
+    </div>
+  </div>
+  <div class="settings-modal" id="settingsModal">
+    <div class="settings-panel">
+      <button class="settings-close" id="closeSettings" title="Close">&times;</button>
+      <h2>Settings</h2>
+      <label>
+        Theme:
+        <select id="themeSelect">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+      <div class="wallpaper-section">
+        <h3 style="margin-bottom:12px;color:var(--text-color);font-size:16px;">Wallpaper</h3>
+        <div class="wallpaper-options">
+          <div class="wallpaper-option">
+            <label class="wallpaper-label">
+              <span class="wallpaper-label-text">Solid Color</span>
+              <input type="color" id="wallpaperColor" title="Pick a background color" class="wallpaper-color-input" />
+      </label>
+          </div>
+          <div class="wallpaper-option">
+            <label class="wallpaper-label">
+              <span class="wallpaper-label-text">Image Upload</span>
+              <input type="file" id="wallpaperFile" accept="image/*" class="wallpaper-file-input" />
+            </label>
+          </div>
+        </div>
+        <div class="wallpaper-preview-container">
+          <span class="wallpaper-preview-label">Preview:</span>
+      <div class="wallpaper-preview" id="wallpaperPreview"></div>
+        </div>
+      </div>
+      <label>
+        User Chat Color:
+        <input type="color" id="userColor" />
+      </label>
+      <label>
+        Other Chat Color:
+        <input type="color" id="otherColor" />
+      </label>
+      <button id="resetDefaultsBtn" style="margin-top:16px;padding:10px 0;border-radius:8px;background:#eee;color:#222;font-weight:bold;cursor:pointer;">Reset to Default</button>
+      <div id="accountSection" style="margin-top:20px;padding-top:20px;border-top:1px solid #ccc;">
+        <h3 style="margin-bottom:10px;color:var(--text-color);">Account</h3>
+        <button id="logoutBtn" style="width:100%;padding:10px 0;border-radius:8px;background:#f87171;color:white;font-weight:bold;cursor:pointer;margin-bottom:8px;">Log Out</button>
+        <button id="deleteAccountBtn" style="width:100%;padding:10px 0;border-radius:8px;background:#dc2626;color:white;font-weight:bold;cursor:pointer;">Delete Account</button>
+      </div>
+    </div>
+  </div>
+  <div class="chat-sidebar-modal" id="chatSidebarModal">
+    <div class="chat-sidebar-panel">
+      <div class="chat-sidebar-header">
+        <span class="chat-sidebar-title">Chats</span>
+        <button class="chat-sidebar-close" id="closeChatSidebar" title="Close">&times;</button>
+      </div>
+      <button class="chat-add-btn" id="addChatBtn" title="Add Chat">＋ New Chat</button>
+      <div class="chat-list" id="chatList"></div>
+    </div>
+  </div>
+
+  <script>
+    // Chat state
+    const messageInput = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendButton");
+    const chatMessages = document.getElementById("chatMessages");
+
+    const defaultChats = ["chat-1"];
+    const chatData = { "chat-1": [] };
+    let currentChat = "chat-1";
+    let currentUser = "Guest";
+    let isLoggedIn = false;
+    let currentLanguage = 'en';
+
+    // Translation data
+    const translations = {
+      en: {
+        title: "BARMITZVAPROJECT",
+        subtitle: "Hello and welcome to our website!\n\nOn this website you can practice the sentences you will read from the Torah during the mitzvah\n\nSign up here below or log in to existing users",
+        discoverTorah: "📖 Discover the Torah",
+        torahScroll: "Torah Scroll\nAncient Wisdom",
+        starOfDavid: "Star of David\nSacred Symbol",
+        menorah: "Menorah\nDivine Light",
+        hebrewText: "Hebrew Text\nSacred Language",
+        whatIsBarMitzvah: "🎯 What is Bar Mitzvah?",
+        barMitzvahDesc: "A Bar Mitzvah is a significant milestone in Jewish tradition, marking the transition from childhood to adulthood. At age 13, a young man becomes responsible for following Jewish commandments and traditions. This special ceremony involves reading from the Torah and leading parts of the service, symbolizing the beginning of their journey as a responsible member of the Jewish community.",
+        torahPractice: "📚 Torah Reading Practice",
+        torahPracticeDesc: "Our platform helps you master the art of Torah reading with interactive practice sessions. Learn the proper pronunciation, cantillation marks, and traditional melodies that bring the ancient Hebrew text to life. Practice makes perfect, and we're here to guide you every step of the way on your spiritual journey.",
+        cantillation: "Cantillation Practice",
+        cantillationDesc: "Learn the traditional melodies and marks that guide Torah reading",
+        pronunciation: "Hebrew Pronunciation",
+        pronunciationDesc: "Master proper Hebrew pronunciation with audio guidance",
+        torahPortions: "Torah Portions",
+        torahPortionsDesc: "Practice with your specific Torah portion and weekly readings",
+        significance: "🌟 The Significance of Torah",
+        significanceDesc: "The Torah is the foundation of Jewish life and learning. It contains the Five Books of Moses and serves as a guide for living a meaningful and ethical life. Reading from the Torah during your Bar Mitzvah connects you to thousands of years of Jewish tradition and wisdom. Each word carries deep meaning and spiritual significance.",
+        learningJourney: "🎓 Your Learning Journey",
+        learningJourneyDesc: "Every Bar Mitzvah student's journey is unique. Our platform adapts to your learning style and pace, providing personalized practice sessions, progress tracking, and encouragement along the way. Whether you're just beginning or perfecting your skills, we're here to support your growth and celebrate your achievements.",
+        progressTracking: "Progress Tracking",
+        progressDesc: "Monitor your improvement with detailed progress reports",
+        personalizedPractice: "Personalized Practice",
+        personalizedDesc: "Customized exercises based on your specific needs",
+        achievementSystem: "Achievement System",
+        achievementDesc: "Earn badges and celebrate milestones in your learning",
+        community: "🤝 Community & Support",
+        communityDesc: "You're not alone on this journey. Connect with other students, share experiences, and learn from each other. Our community features allow you to ask questions, get encouragement, and celebrate together as you prepare for this important milestone in your life.",
+        readyToBegin: "🚀 Ready to Begin Your Journey?",
+        readyDesc: "Join thousands of students who have successfully prepared for their Bar Mitzvah with our platform. Start your Torah reading practice today and make your special day truly memorable!",
+        logIn: "📚 Log In",
+        signUp: "✨ Sign Up",
+        tryGuest: "👀 Try as Guest",
+        welcomeJourney: "Welcome to Your Journey!",
+        preparingExperience: "Preparing your Torah reading experience...",
+        welcomeGuest: "Welcome, Guest!",
+        exploringPractice: "Exploring Torah reading practice...",
+        loggedInAs: "Logged in as: Guest",
+        // Chat interface
+        chatHeader: "BARMITZVAPROJECT - ALPHA",
+        messagePlaceholder: "Type a message...",
+        sendButton: "Send",
+        emptyState: "Welcome {user} to BARMITZVAPROJECT - ALPHA, ask anything!",
+        defaultResponse: "Thanks for your message!",
+        // Settings
+        settingsTitle: "Settings",
+        themeLabel: "Theme:",
+        lightTheme: "Light",
+        darkTheme: "Dark",
+        wallpaperLabel: "Wallpaper",
+        solidColor: "Solid Color",
+        imageUpload: "Image Upload",
+        preview: "Preview:",
+        userChatColor: "User Chat Color:",
+        otherChatColor: "Other Chat Color:",
+        resetDefaults: "Reset to Default",
+        accountSection: "Account",
+        logout: "Log Out",
+        deleteAccount: "Delete Account",
+        deleteConfirm: "Are you sure you want to delete your account? This action cannot be undone.",
+        // Chat sidebar
+        chatsTitle: "Chats",
+        newChat: "＋ New Chat",
+        editChat: "Edit",
+        deleteChat: "Delete",
+        deleteChatConfirm: "Delete chat '{name}'?",
+        atLeastOneChat: "At least one chat must remain.",
+        invalidChatName: "Invalid or duplicate chat name.",
+        // Message actions
+        editMessage: "Edit",
+        deleteMessage: "Delete",
+        cancelEdit: "✖"
+      },
+      he: {
+        title: "פרויקט בר מצווה",
+        subtitle: "שלום וברוכים הבאים לאתר שלנו!\n\nבאתר זה תוכלו לתרגל את המשפטים שתקראו מספר התורה בזמן המצווה\n\nהרשמו פה למטה או הכנסו למשתמשים קיימים",
+        discoverTorah: "📖 גלו את התורה",
+        torahScroll: "מגילת תורה\nחכמה עתיקה",
+        starOfDavid: "מגן דוד\nסמל קדוש",
+        menorah: "מנורה\nאור אלוהי",
+        hebrewText: "טקסט עברי\nשפה קדושה",
+        whatIsBarMitzvah: "🎯 מה זה בר מצווה?",
+        barMitzvahDesc: "בר מצווה הוא אבן דרך משמעותית במסורת היהודית, המסמנת את המעבר מילדות לבגרות. בגיל 13, נער צעיר הופך אחראי לקיום מצוות ומסורות יהודיות. הטקס המיוחד הזה כולל קריאה מהתורה והנהגת חלקים מהתפילה, המסמלים את תחילת המסע שלו כחבר אחראי בקהילה היהודית.",
+        torahPractice: "📚 תרגול קריאת תורה",
+        torahPracticeDesc: "הפלטפורמה שלנו עוזרת לכם לשלוט באמנות קריאת התורה עם מפגשי תרגול אינטראקטיביים. למדו את ההגייה הנכונה, סימני הטעמים והמנגינות המסורתיות שמחיות את הטקסט העברי העתיק. תרגול עושה מושלם, ואנחנו כאן להדריך אתכם בכל שלב בדרך הרוחנית שלכם.",
+        cantillation: "תרגול טעמים",
+        cantillationDesc: "למדו את המנגינות והסימנים המסורתיים שמנחים את קריאת התורה",
+        pronunciation: "הגייה עברית",
+        pronunciationDesc: "שלטו בהגייה עברית נכונה עם הדרכה קולית",
+        torahPortions: "פרשיות תורה",
+        torahPortionsDesc: "תרגלו עם הפרשה הספציפית שלכם וקריאות שבועיות",
+        significance: "🌟 חשיבות התורה",
+        significanceDesc: "התורה היא יסוד החיים והלימוד היהודיים. היא מכילה את חמשת חומשי תורה ומשמשת כמדריך לחיים משמעותיים ואתיים. קריאה מהתורה במהלך בר המצווה שלכם מחברת אתכם לאלפי שנות מסורת וחכמה יהודית. כל מילה נושאת משמעות עמוקה וחשיבות רוחנית.",
+        learningJourney: "🎓 מסע הלמידה שלכם",
+        learningJourneyDesc: "כל מסע של תלמיד בר מצווה הוא ייחודי. הפלטפורמה שלנו מתאימה לסגנון הלמידה והקצב שלכם, ומספקת מפגשי תרגול מותאמים אישית, מעקב התקדמות ועידוד לאורך הדרך. בין אם אתם רק מתחילים או משפרים את הכישורים שלכם, אנחנו כאן לתמוך בצמיחה שלכם ולחגוג את ההישגים שלכם.",
+        progressTracking: "מעקב התקדמות",
+        progressDesc: "עקבו אחר השיפור שלכם עם דוחות התקדמות מפורטים",
+        personalizedPractice: "תרגול מותאם אישית",
+        personalizedDesc: "תרגילים מותאמים בהתבסס על הצרכים הספציפיים שלכם",
+        achievementSystem: "מערכת הישגים",
+        achievementDesc: "הרוויחו תגים וחגגו אבני דרך בלמידה שלכם",
+        community: "🤝 קהילה ותמיכה",
+        communityDesc: "אתם לא לבד במסע הזה. התחברו עם תלמידים אחרים, שתפו חוויות ולמדו זה מזה. תכונות הקהילה שלנו מאפשרות לכם לשאול שאלות, לקבל עידוד ולחגוג יחד בזמן שאתם מתכוננים לאבן הדרך החשובה הזו בחיים שלכם.",
+        readyToBegin: "🚀 מוכנים להתחיל את המסע?",
+        readyDesc: "הצטרפו לאלפי תלמידים שהתכוננו בהצלחה לבר המצווה שלהם עם הפלטפורמה שלנו. התחילו את תרגול קריאת התורה היום ועשו את היום המיוחד שלכם באמת בלתי נשכח!",
+        logIn: "📚 התחברות",
+        signUp: "✨ הרשמה",
+        tryGuest: "👀 נסו כאורח",
+        welcomeJourney: "ברוכים הבאים למסע שלכם!",
+        preparingExperience: "מכינים את חוויית קריאת התורה שלכם...",
+        welcomeGuest: "ברוכים הבאים, אורח!",
+        exploringPractice: "חוקרים תרגול קריאת תורה...",
+        loggedInAs: "מחובר בתור: אורח",
+        // Chat interface
+        chatHeader: "פרויקט בר מצווה - אלפא",
+        messagePlaceholder: "הקלד הודעה...",
+        sendButton: "שלח",
+        emptyState: "ברוכים הבאים {user} לפרויקט בר מצווה - אלפא, שאלו כל דבר!",
+        defaultResponse: "תודה על ההודעה שלכם!",
+        // Settings
+        settingsTitle: "הגדרות",
+        themeLabel: "ערכת נושא:",
+        lightTheme: "בהיר",
+        darkTheme: "כהה",
+        wallpaperLabel: "רקע",
+        solidColor: "צבע אחיד",
+        imageUpload: "העלאת תמונה",
+        preview: "תצוגה מקדימה:",
+        userChatColor: "צבע הודעות משתמש:",
+        otherChatColor: "צבע הודעות אחרות:",
+        resetDefaults: "איפוס לברירת מחדל",
+        accountSection: "חשבון",
+        logout: "התנתק",
+        deleteAccount: "מחק חשבון",
+        deleteConfirm: "האם אתם בטוחים שברצונכם למחוק את החשבון? פעולה זו לא ניתנת לביטול.",
+        // Chat sidebar
+        chatsTitle: "צ'אטים",
+        newChat: "＋ צ'אט חדש",
+        editChat: "ערוך",
+        deleteChat: "מחק",
+        deleteChatConfirm: "מחק צ'אט '{name}'?",
+        atLeastOneChat: "חייב להישאר לפחות צ'אט אחד.",
+        invalidChatName: "שם צ'אט לא תקין או כפול.",
+        // Message actions
+        editMessage: "ערוך",
+        deleteMessage: "מחק",
+        cancelEdit: "✖"
+      },
+      es: {
+        title: "PROYECTO BAR MITZVAH",
+        subtitle: "¡Hola y bienvenidos a nuestro sitio web!\n\nEn este sitio web puedes practicar las oraciones que leerás del Torá durante la mitzvá\n\nRegístrate aquí abajo o inicia sesión con usuarios existentes",
+        discoverTorah: "📖 Descubre el Torá",
+        torahScroll: "Pergamino del Torá\nSabiduría Antigua",
+        starOfDavid: "Estrella de David\nSímbolo Sagrado",
+        menorah: "Menorá\nLuz Divina",
+        hebrewText: "Texto Hebreo\nLengua Sagrada",
+        whatIsBarMitzvah: "🎯 ¿Qué es Bar Mitzvá?",
+        barMitzvahDesc: "Un Bar Mitzvá es un hito significativo en la tradición judía, marcando la transición de la infancia a la edad adulta. A los 13 años, un joven se vuelve responsable de seguir los mandamientos y tradiciones judías. Esta ceremonia especial involucra leer del Torá y dirigir partes del servicio, simbolizando el comienzo de su viaje como miembro responsable de la comunidad judía.",
+        torahPractice: "📚 Práctica de Lectura del Torá",
+        torahPracticeDesc: "Nuestra plataforma te ayuda a dominar el arte de la lectura del Torá con sesiones de práctica interactivas. Aprende la pronunciación correcta, marcas de cantilación y melodías tradicionales que dan vida al texto hebreo antiguo. La práctica hace la perfección, y estamos aquí para guiarte en cada paso de tu viaje espiritual.",
+        cantillation: "Práctica de Cantilación",
+        cantillationDesc: "Aprende las melodías y marcas tradicionales que guían la lectura del Torá",
+        pronunciation: "Pronunciación Hebrea",
+        pronunciationDesc: "Domina la pronunciación hebrea correcta con guía de audio",
+        torahPortions: "Porciones del Torá",
+        torahPortionsDesc: "Practica con tu porción específica del Torá y lecturas semanales",
+        significance: "🌟 La Importancia del Torá",
+        significanceDesc: "El Torá es la base de la vida y el aprendizaje judíos. Contiene los Cinco Libros de Moisés y sirve como guía para vivir una vida significativa y ética. Leer del Torá durante tu Bar Mitzvá te conecta con miles de años de tradición y sabiduría judía. Cada palabra lleva un significado profundo e importancia espiritual.",
+        learningJourney: "🎓 Tu Viaje de Aprendizaje",
+        learningJourneyDesc: "Cada viaje de estudiante de Bar Mitzvá es único. Nuestra plataforma se adapta a tu estilo y ritmo de aprendizaje, proporcionando sesiones de práctica personalizadas, seguimiento de progreso y aliento en el camino. Ya sea que estés comenzando o perfeccionando tus habilidades, estamos aquí para apoyar tu crecimiento y celebrar tus logros.",
+        progressTracking: "Seguimiento de Progreso",
+        progressDesc: "Monitorea tu mejora con reportes detallados de progreso",
+        personalizedPractice: "Práctica Personalizada",
+        personalizedDesc: "Ejercicios personalizados basados en tus necesidades específicas",
+        achievementSystem: "Sistema de Logros",
+        achievementDesc: "Gana insignias y celebra hitos en tu aprendizaje",
+        community: "🤝 Comunidad y Apoyo",
+        communityDesc: "No estás solo en este viaje. Conéctate con otros estudiantes, comparte experiencias y aprende unos de otros. Nuestras características de comunidad te permiten hacer preguntas, recibir aliento y celebrar juntos mientras te preparas para este importante hito en tu vida.",
+        readyToBegin: "🚀 ¿Listo para Comenzar tu Viaje?",
+        readyDesc: "¡Únete a miles de estudiantes que se han preparado exitosamente para su Bar Mitzvá con nuestra plataforma. Comienza tu práctica de lectura del Torá hoy y haz que tu día especial sea verdaderamente memorable!",
+        logIn: "📚 Iniciar Sesión",
+        signUp: "✨ Registrarse",
+        tryGuest: "👀 Probar como Invitado",
+        welcomeJourney: "¡Bienvenido a tu Viaje!",
+        preparingExperience: "Preparando tu experiencia de lectura del Torá...",
+        welcomeGuest: "¡Bienvenido, Invitado!",
+        exploringPractice: "Explorando práctica de lectura del Torá...",
+        loggedInAs: "Conectado como: Invitado",
+        // Chat interface
+        chatHeader: "PROYECTO BAR MITZVAH - ALFA",
+        messagePlaceholder: "Escribe un mensaje...",
+        sendButton: "Enviar",
+        emptyState: "¡Bienvenido {user} al PROYECTO BAR MITZVAH - ALFA, pregunta cualquier cosa!",
+        defaultResponse: "¡Gracias por tu mensaje!",
+        // Settings
+        settingsTitle: "Configuración",
+        themeLabel: "Tema:",
+        lightTheme: "Claro",
+        darkTheme: "Oscuro",
+        wallpaperLabel: "Fondo de pantalla",
+        solidColor: "Color sólido",
+        imageUpload: "Subir imagen",
+        preview: "Vista previa:",
+        userChatColor: "Color de chat del usuario:",
+        otherChatColor: "Color de chat de otros:",
+        resetDefaults: "Restablecer por defecto",
+        accountSection: "Cuenta",
+        logout: "Cerrar sesión",
+        deleteAccount: "Eliminar cuenta",
+        deleteConfirm: "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.",
+        // Chat sidebar
+        chatsTitle: "Chats",
+        newChat: "＋ Nuevo Chat",
+        editChat: "Editar",
+        deleteChat: "Eliminar",
+        deleteChatConfirm: "¿Eliminar chat '{name}'?",
+        atLeastOneChat: "Debe quedar al menos un chat.",
+        invalidChatName: "Nombre de chat inválido o duplicado.",
+        // Message actions
+        editMessage: "Editar",
+        deleteMessage: "Eliminar",
+        cancelEdit: "✖"
+      },
+      zh: {
+        title: "成人礼项目",
+        subtitle: "你好，欢迎来到我们的网站！\n\n在这个网站上，你可以练习在成人礼期间从托拉中阅读的句子\n\n在下面注册或登录现有用户",
+        discoverTorah: "📖 发现托拉",
+        torahScroll: "托拉卷轴\n古代智慧",
+        starOfDavid: "大卫之星\n神圣符号",
+        menorah: "烛台\n神圣之光",
+        hebrewText: "希伯来文本\n神圣语言",
+        whatIsBarMitzvah: "🎯 什么是成人礼？",
+        barMitzvahDesc: "成人礼是犹太传统中的一个重要里程碑，标志着从童年到成年的过渡。在13岁时，一个年轻人有责任遵循犹太诫命和传统。这个特殊仪式包括从托拉中阅读和领导部分仪式，象征着他们作为犹太社区负责任成员旅程的开始。",
+        torahPractice: "📚 托拉阅读练习",
+        torahPracticeDesc: "我们的平台通过互动练习课程帮助您掌握托拉阅读的艺术。学习正确的发音、吟诵标记和传统旋律，让古老的希伯来文本栩栩如生。熟能生巧，我们在这里指导您精神旅程的每一步。",
+        cantillation: "吟诵练习",
+        cantillationDesc: "学习指导托拉阅读的传统旋律和标记",
+        pronunciation: "希伯来语发音",
+        pronunciationDesc: "通过音频指导掌握正确的希伯来语发音",
+        torahPortions: "托拉部分",
+        torahPortionsDesc: "练习您特定的托拉部分和每周阅读",
+        significance: "🌟 托拉的意义",
+        significanceDesc: "托拉是犹太生活和学习的基础。它包含摩西五经，并作为过有意义和道德生活的指南。在您的成人礼期间从托拉中阅读将您与数千年的犹太传统和智慧联系起来。每个词都承载着深刻的意义和精神重要性。",
+        learningJourney: "🎓 您的学习之旅",
+        learningJourneyDesc: "每个成人礼学生的学习之旅都是独特的。我们的平台适应您的学习风格和节奏，提供个性化练习课程、进度跟踪和沿途的鼓励。无论您是刚开始还是完善技能，我们都在这里支持您的成长并庆祝您的成就。",
+        progressTracking: "进度跟踪",
+        progressDesc: "通过详细的进度报告监控您的改进",
+        personalizedPractice: "个性化练习",
+        personalizedDesc: "基于您特定需求的定制练习",
+        achievementSystem: "成就系统",
+        achievementDesc: "获得徽章并庆祝学习中的里程碑",
+        community: "🤝 社区与支持",
+        communityDesc: "您在这个旅程中并不孤单。与其他学生联系，分享经验，互相学习。我们的社区功能允许您提问、获得鼓励，并在您为生活中这个重要里程碑做准备时一起庆祝。",
+        readyToBegin: "🚀 准备好开始您的旅程了吗？",
+        readyDesc: "加入数千名通过我们的平台成功准备成人礼的学生。今天开始您的托拉阅读练习，让您的特殊日子真正令人难忘！",
+        logIn: "📚 登录",
+        signUp: "✨ 注册",
+        tryGuest: "👀 以访客身份尝试",
+        welcomeJourney: "欢迎来到您的旅程！",
+        preparingExperience: "准备您的托拉阅读体验...",
+        welcomeGuest: "欢迎，访客！",
+        exploringPractice: "探索托拉阅读练习...",
+        loggedInAs: "登录为：访客",
+        // Chat interface
+        chatHeader: "成人礼项目 - 阿尔法",
+        messagePlaceholder: "输入消息...",
+        sendButton: "发送",
+        emptyState: "欢迎 {user} 来到成人礼项目 - 阿尔法，请问任何问题！",
+        defaultResponse: "谢谢您的消息！",
+        // Settings
+        settingsTitle: "设置",
+        themeLabel: "主题：",
+        lightTheme: "浅色",
+        darkTheme: "深色",
+        wallpaperLabel: "壁纸",
+        solidColor: "纯色",
+        imageUpload: "上传图片",
+        preview: "预览：",
+        userChatColor: "用户聊天颜色：",
+        otherChatColor: "其他聊天颜色：",
+        resetDefaults: "重置为默认",
+        accountSection: "账户",
+        logout: "退出登录",
+        deleteAccount: "删除账户",
+        deleteConfirm: "您确定要删除您的账户吗？此操作无法撤销。",
+        // Chat sidebar
+        chatsTitle: "聊天",
+        newChat: "＋ 新聊天",
+        editChat: "编辑",
+        deleteChat: "删除",
+        deleteChatConfirm: "删除聊天 '{name}'？",
+        atLeastOneChat: "必须至少保留一个聊天。",
+        invalidChatName: "聊天名称无效或重复。",
+        // Message actions
+        editMessage: "编辑",
+        deleteMessage: "删除",
+        cancelEdit: "✖"
+      },
+      ja: {
+        title: "バル・ミツバー・プロジェクト",
+        subtitle: "こんにちは、私たちのウェブサイトへようこそ！\n\nこのウェブサイトでは、ミツバー中にトーラーから読む文章を練習できます\n\n下で登録するか、既存のユーザーでログインしてください",
+        discoverTorah: "📖 トーラーを発見",
+        torahScroll: "トーラーの巻物\n古代の知恵",
+        starOfDavid: "ダビデの星\n聖なるシンボル",
+        menorah: "メノラー\n神聖な光",
+        hebrewText: "ヘブライ語テキスト\n聖なる言語",
+        whatIsBarMitzvah: "🎯 バル・ミツバーとは？",
+        barMitzvahDesc: "バル・ミツバーはユダヤの伝統における重要な節目で、子供時代から成人期への移行を示します。13歳で、若い男性はユダヤの戒律と伝統に従う責任を持つようになります。この特別な儀式には、トーラーからの朗読と礼拝の一部を導くことが含まれ、ユダヤコミュニティの責任あるメンバーとしての旅の始まりを象徴します。",
+        torahPractice: "📚 トーラー朗読練習",
+        torahPracticeDesc: "私たちのプラットフォームは、インタラクティブな練習セッションでトーラー朗読の技術を習得するのに役立ちます。正しい発音、カンティレーション記号、古代ヘブライ語テキストを生き生きとさせる伝統的なメロディーを学びましょう。練習が完璧を作り、私たちはあなたの精神的旅のすべてのステップでガイドします。",
+        cantillation: "カンティレーション練習",
+        cantillationDesc: "トーラー朗読を導く伝統的なメロディーと記号を学ぶ",
+        pronunciation: "ヘブライ語発音",
+        pronunciationDesc: "オーディオガイダンスで正しいヘブライ語発音を習得",
+        torahPortions: "トーラーの部分",
+        torahPortionsDesc: "あなたの特定のトーラーの部分と週次朗読で練習",
+        significance: "🌟 トーラーの意義",
+        significanceDesc: "トーラーはユダヤの生活と学習の基盤です。モーセの五書を含み、意味のある倫理的な生活を送るためのガイドとして機能します。バル・ミツバー中にトーラーから読むことは、何千年ものユダヤの伝統と知恵にあなたを結びつけます。すべての言葉は深い意味と精神的重要性を持っています。",
+        learningJourney: "🎓 あなたの学習の旅",
+        learningJourneyDesc: "すべてのバル・ミツバー学生の旅は独特です。私たちのプラットフォームはあなたの学習スタイルとペースに適応し、パーソナライズされた練習セッション、進捗追跡、そして道中の励ましを提供します。始めたばかりでも、スキルを完璧にしても、私たちはあなたの成長をサポートし、あなたの成果を祝います。",
+        progressTracking: "進捗追跡",
+        progressDesc: "詳細な進捗レポートで改善を監視",
+        personalizedPractice: "パーソナライズされた練習",
+        personalizedDesc: "あなたの特定のニーズに基づいたカスタマイズされた練習",
+        achievementSystem: "実績システム",
+        achievementDesc: "バッジを獲得し、学習のマイルストーンを祝う",
+        community: "🤝 コミュニティとサポート",
+        communityDesc: "この旅で一人ではありません。他の学生とつながり、経験を共有し、お互いから学びましょう。私たちのコミュニティ機能により、質問をしたり、励ましを受けたり、人生のこの重要な節目の準備をしながら一緒に祝うことができます。",
+        readyToBegin: "🚀 旅を始める準備はできましたか？",
+        readyDesc: "私たちのプラットフォームでバル・ミツバーの準備に成功した何千もの学生に参加してください。今日トーラー朗読練習を始めて、あなたの特別な日を本当に忘れられないものにしましょう！",
+        logIn: "📚 ログイン",
+        signUp: "✨ サインアップ",
+        tryGuest: "👀 ゲストとして試す",
+        welcomeJourney: "あなたの旅へようこそ！",
+        preparingExperience: "トーラー朗読体験を準備中...",
+        welcomeGuest: "ようこそ、ゲスト！",
+        exploringPractice: "トーラー朗読練習を探索中...",
+        loggedInAs: "ログイン中：ゲスト",
+        // Chat interface
+        chatHeader: "バル・ミツバー・プロジェクト - アルファ",
+        messagePlaceholder: "メッセージを入力...",
+        sendButton: "送信",
+        emptyState: "バル・ミツバー・プロジェクト - アルファへようこそ {user}、何でもお聞きください！",
+        defaultResponse: "メッセージをありがとうございます！",
+        // Settings
+        settingsTitle: "設定",
+        themeLabel: "テーマ：",
+        lightTheme: "ライト",
+        darkTheme: "ダーク",
+        wallpaperLabel: "壁紙",
+        solidColor: "単色",
+        imageUpload: "画像アップロード",
+        preview: "プレビュー：",
+        userChatColor: "ユーザーチャット色：",
+        otherChatColor: "その他のチャット色：",
+        resetDefaults: "デフォルトにリセット",
+        accountSection: "アカウント",
+        logout: "ログアウト",
+        deleteAccount: "アカウント削除",
+        deleteConfirm: "アカウントを削除してもよろしいですか？この操作は元に戻せません。",
+        // Chat sidebar
+        chatsTitle: "チャット",
+        newChat: "＋ 新しいチャット",
+        editChat: "編集",
+        deleteChat: "削除",
+        deleteChatConfirm: "チャット '{name}' を削除しますか？",
+        atLeastOneChat: "少なくとも1つのチャットを残す必要があります。",
+        invalidChatName: "無効または重複するチャット名です。",
+        // Message actions
+        editMessage: "編集",
+        deleteMessage: "削除",
+        cancelEdit: "✖"
+      }
+    };
+
+    function formatTime() {
+      const now = new Date();
+      return now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function renderMessages() {
+      const messages = chatData[currentChat] || [];
+      if (messages.length === 0) {
+        const t = translations[currentLanguage];
+        const emptyStateText = t.emptyState.replace('{user}', currentUser);
+        chatMessages.innerHTML = `<div class="empty-state">${emptyStateText}</div>`;
+        return;
+      }
+      chatMessages.innerHTML = messages.map((msg, index) => {
+        if (msg.isEdit) {
+          return `<div class="message user">
+            <input class="msg-edit-input" type="text" value="${msg.text.replace(/&/g,'&amp;').replace(/</g,'&lt;')}" data-edit-msg="${index}" maxlength="500" />
+            <button class="msg-actions-btn" style="opacity:1;pointer-events:auto;right:4px;top:4px;" data-cancel-edit="${index}">✖</button>
+          </div>`;
+        }
+        let actions = '';
+        if (msg.isUser) {
+          actions = `
+            <button class="msg-actions-btn" data-actions-btn="${index}">⋯</button>
+            <div class="msg-actions-menu" id="msgMenu${index}" style="display:none;">
+              <button data-edit-msg-btn="${index}">Edit</button>
+              <button data-delete-msg-btn="${index}">Delete</button>
+            </div>
+          `;
+        }
+        return `<div class="message ${msg.isUser ? 'user' : 'other'}" data-msg-idx="${index}">
+          ${actions}
+          <div>${msg.text}</div>
+          <div class="message-time">${msg.time}</div>
+        </div>`;
+      }).join('');
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      attachMessageActions();
+    }
+
+    function sendMessage() {
+      const text = messageInput.value.trim();
+      if (!text) return;
+      const msg = { text, isUser: true, time: formatTime() };
+      chatData[currentChat].push(msg);
+      messageInput.value = "";
+      sendButton.disabled = true;
+      renderMessages();
+      setTimeout(() => {
+        const t = translations[currentLanguage];
+        const reply = { text: t.defaultResponse, isUser: false, time: formatTime() };
+        chatData[currentChat].push(reply);
+        renderMessages();
+      }, 1000);
+    }
+
+    function deleteMessage(index) {
+      chatData[currentChat].splice(index, 1);
+      renderMessages();
+    }
+
+    function attachMessageActions() {
+      // 3-dots menu
+      document.querySelectorAll('.msg-actions-btn[data-actions-btn]').forEach(btn => {
+        const idx = btn.getAttribute('data-actions-btn');
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          // Hide all other menus
+          document.querySelectorAll('.msg-actions-menu').forEach(m => m.style.display = 'none');
+          const menu = document.getElementById('msgMenu'+idx);
+          if (menu) menu.style.display = 'flex';
+          // Close on click outside
+          document.addEventListener('mousedown', function handler(ev) {
+            if (!menu.contains(ev.target) && ev.target !== btn) {
+              menu.style.display = 'none';
+              document.removeEventListener('mousedown', handler);
+            }
+          });
+        };
+      });
+      // Edit
+      document.querySelectorAll('[data-edit-msg-btn]').forEach(btn => {
+        const idx = +btn.getAttribute('data-edit-msg-btn');
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          chatData[currentChat][idx].isEdit = true;
+          renderMessages();
+        };
+      });
+      // Delete
+      document.querySelectorAll('[data-delete-msg-btn]').forEach(btn => {
+        const idx = +btn.getAttribute('data-delete-msg-btn');
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          chatData[currentChat].splice(idx, 1);
+          renderMessages();
+        };
+      });
+      // Edit input
+      document.querySelectorAll('.msg-edit-input').forEach(input => {
+        const idx = +input.getAttribute('data-edit-msg');
+        input.focus();
+        input.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            const val = input.value.trim();
+            if (val) {
+              chatData[currentChat][idx].text = val;
+              delete chatData[currentChat][idx].isEdit;
+              renderMessages();
+            }
+          } else if (e.key === 'Escape') {
+            delete chatData[currentChat][idx].isEdit;
+            renderMessages();
+          }
+        };
+      });
+      // Cancel edit
+      document.querySelectorAll('[data-cancel-edit]').forEach(btn => {
+        const idx = +btn.getAttribute('data-cancel-edit');
+        btn.onclick = () => {
+          delete chatData[currentChat][idx].isEdit;
+          renderMessages();
+        };
+      });
+    }
+
+    // Chat sidebar logic
+    const chatSidebarModal = document.getElementById('chatSidebarModal');
+    const chatList = document.getElementById('chatList');
+    const openChatSidebar = document.getElementById('openChatSidebar');
+    const closeChatSidebar = document.getElementById('closeChatSidebar');
+    const addChatBtn = document.getElementById('addChatBtn');
+
+    function renderChatList() {
+      chatList.innerHTML = Object.keys(chatData).map((key, idx) => {
+        const selected = currentChat === key ? 'selected' : '';
+        return `<div class="chat-list-item ${selected}" data-chat="${key}">
+          <span class="chat-list-icon">💬</span>
+          <span class="chat-list-name" data-name="${key}">${key}</span>
+          <input class="chat-list-edit" data-edit="${key}" style="display:none;" value="${key}" maxlength="20" />
+          <div class="chat-list-actions">
+            <button class="chat-list-action-btn chat-edit-btn" title="Edit" data-edit-btn="${key}">✏️</button>
+            <button class="chat-list-action-btn chat-delete-btn" title="Delete" data-delete-btn="${key}">🗑️</button>
+          </div>
+        </div>`;
+      }).join('');
+      attachChatListEvents();
+    }
+
+    function attachChatListEvents() {
+      document.querySelectorAll('.chat-list-item').forEach(item => {
+        const chatKey = item.getAttribute('data-chat');
+        item.onclick = (e) => {
+          if (e.target.closest('.chat-list-actions')) return;
+          currentChat = chatKey;
+          renderChatList();
+          renderMessages();
+        };
+        // Edit
+        item.querySelector('.chat-edit-btn').onclick = (e) => {
+          e.stopPropagation();
+          const nameSpan = item.querySelector('.chat-list-name');
+          const editInput = item.querySelector('.chat-list-edit');
+          nameSpan.style.display = 'none';
+          editInput.style.display = 'inline-block';
+          editInput.focus();
+          editInput.select();
+        };
+        // Delete
+        item.querySelector('.chat-delete-btn').onclick = (e) => {
+          e.stopPropagation();
+          if (Object.keys(chatData).length === 1) {
+            alert('At least one chat must remain.');
+            return;
+          }
+          if (confirm(`Delete chat '${chatKey}'?`)) {
+            delete chatData[chatKey];
+            if (currentChat === chatKey) {
+              currentChat = Object.keys(chatData)[0];
+              renderMessages();
+            }
+            renderChatList();
+          }
+        };
+        // Edit input
+        const editInput = item.querySelector('.chat-list-edit');
+        editInput.onblur = () => {
+          editInput.style.display = 'none';
+          item.querySelector('.chat-list-name').style.display = 'inline';
+        };
+        editInput.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            const newName = editInput.value.trim();
+            if (!newName || chatData[newName]) {
+              alert('Invalid or duplicate chat name.');
+              return;
+            }
+            chatData[newName] = chatData[chatKey];
+            delete chatData[chatKey];
+            currentChat = newName;
+            renderChatList();
+            renderMessages();
+          } else if (e.key === 'Escape') {
+            editInput.blur();
+          }
+        };
+      });
+    }
+
+    addChatBtn.onclick = () => {
+      let base = 'New Chat';
+      let name = base;
+      let i = 1;
+      while (chatData[name]) name = base + ' ' + (i++);
+      chatData[name] = [];
+      currentChat = name;
+      renderChatList();
+    renderMessages();
+    };
+
+    openChatSidebar.onclick = () => {
+      if (chatSidebarModal.classList.contains('active')) {
+        chatSidebarModal.classList.remove('active');
+      } else {
+        chatSidebarModal.classList.add('active');
+        settingsModal.classList.remove('active');
+      }
+    };
+    closeChatSidebar.onclick = () => {
+      chatSidebarModal.classList.remove('active');
+    };
+
+    // Input and send logic
+    messageInput.addEventListener("input", () => sendButton.disabled = !messageInput.value.trim());
+    sendButton.addEventListener("click", sendMessage);
+    messageInput.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
+
+    // Initial render
+    renderChatList();
+    renderMessages();
+
+    // Settings panel logic
+    const openSettings = document.getElementById('openSettings');
+    const closeSettings = document.getElementById('closeSettings');
+    const settingsModal = document.getElementById('settingsModal');
+    const themeSelect = document.getElementById('themeSelect');
+    const wallpaperColor = document.getElementById('wallpaperColor');
+    const wallpaperFile = document.getElementById('wallpaperFile');
+    const wallpaperPreview = document.getElementById('wallpaperPreview');
+    const userColor = document.getElementById('userColor');
+    const otherColor = document.getElementById('otherColor');
+    const resetDefaultsBtn = document.getElementById('resetDefaultsBtn');
+
+    // Load settings from localStorage
+    function loadSettings() {
+      const theme = localStorage.getItem('theme');
+      if (theme === 'dark') {
+        document.body.classList.add('dark');
+        themeSelect.value = 'dark';
+      } else {
+        document.body.classList.remove('dark');
+        themeSelect.value = 'light';
+      }
+      const wallColor = localStorage.getItem('wallpaperColor');
+      if (wallColor) {
+        document.body.style.backgroundImage = '';
+        document.body.style.backgroundColor = wallColor;
+        wallpaperColor.value = wallColor;
+        wallpaperPreview.style.background = wallColor;
+      } else {
+        document.body.style.backgroundColor = '';
+        wallpaperPreview.style.background = '';
+      }
+      const wallImg = localStorage.getItem('wallpaperImage');
+      if (wallImg) {
+        document.body.style.backgroundImage = `url('${wallImg}')`;
+        wallpaperPreview.style.backgroundImage = `url('${wallImg}')`;
+      } else {
+        document.body.style.backgroundImage = '';
+        wallpaperPreview.style.backgroundImage = '';
+      }
+      const userCol = localStorage.getItem('userColor');
+      if (userCol) {
+        document.documentElement.style.setProperty('--user-msg-bg', userCol);
+        userColor.value = userCol;
+      }
+      const otherCol = localStorage.getItem('otherColor');
+      if (otherCol) {
+        document.documentElement.style.setProperty('--other-msg-bg', otherCol);
+        otherColor.value = otherCol;
+      }
+    }
+    loadSettings();
+
+    openSettings.onclick = () => {
+      if (settingsModal.classList.contains('active')) {
+        settingsModal.classList.remove('active');
+      } else {
+        settingsModal.classList.add('active');
+        chatSidebarModal.classList.remove('active');
+      }
+    };
+    closeSettings.onclick = () => {
+      settingsModal.classList.remove('active');
+    };
+    openChatSidebar.onclick = () => {
+      if (chatSidebarModal.classList.contains('active')) {
+        chatSidebarModal.classList.remove('active');
+      } else {
+        chatSidebarModal.classList.add('active');
+        settingsModal.classList.remove('active');
+      }
+    };
+    closeChatSidebar.onclick = () => {
+      chatSidebarModal.classList.remove('active');
+    };
+    // Remove click-outside-to-close for sidebar
+    // settingsModal.onclick = (e) => {
+    //   if (e.target === settingsModal) settingsModal.classList.remove('active');
+    // };
+
+    themeSelect.onchange = () => {
+      if (themeSelect.value === 'dark') {
+        document.body.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.body.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    };
+    wallpaperColor.oninput = () => {
+      document.body.style.backgroundImage = '';
+      document.body.style.backgroundColor = wallpaperColor.value;
+      wallpaperPreview.style.background = wallpaperColor.value;
+      wallpaperPreview.style.backgroundImage = '';
+      localStorage.setItem('wallpaperColor', wallpaperColor.value);
+      localStorage.removeItem('wallpaperImage');
+    };
+    wallpaperFile.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        document.body.style.backgroundImage = `url('${ev.target.result}')`;
+        wallpaperPreview.style.backgroundImage = `url('${ev.target.result}')`;
+        wallpaperPreview.style.background = '';
+        localStorage.setItem('wallpaperImage', ev.target.result);
+        localStorage.removeItem('wallpaperColor');
+      };
+      reader.readAsDataURL(file);
+    };
+    userColor.oninput = () => {
+      document.documentElement.style.setProperty('--user-msg-bg', userColor.value);
+      localStorage.setItem('userColor', userColor.value);
+    };
+    otherColor.oninput = () => {
+      document.documentElement.style.setProperty('--other-msg-bg', otherColor.value);
+      localStorage.setItem('otherColor', otherColor.value);
+    };
+    resetDefaultsBtn.onclick = () => {
+      // Remove all customizations
+      localStorage.removeItem('theme');
+      localStorage.removeItem('wallpaperColor');
+      localStorage.removeItem('wallpaperImage');
+      localStorage.removeItem('userColor');
+      localStorage.removeItem('otherColor');
+      document.body.classList.remove('dark');
+      document.body.style.backgroundColor = '';
+      document.body.style.backgroundImage = '';
+      document.documentElement.style.setProperty('--user-msg-bg', '#d1fae5');
+      document.documentElement.style.setProperty('--other-msg-bg', '#e5e7eb');
+      renderMessages();
+      loadSettings();
+    };
+
+    // Landing page logic
+    const landingPage = document.getElementById('landingPage');
+    const landingLoginBtn = document.getElementById('landingLoginBtn');
+    const landingSignupBtn = document.getElementById('landingSignupBtn');
+    const landingGuestBtn = document.getElementById('landingGuestBtn');
+    const chatContainer = document.querySelector('.chat-container');
+    const guestInfo = document.getElementById('guestInfo');
+
+    function showTransitionAnimation(userType) {
+      const transitionOverlay = document.getElementById('transitionOverlay');
+      const landingPage = document.getElementById('landingPage');
+      const chatContainer = document.querySelector('.chat-container');
+      
+      // Update transition content based on user type
+      const transitionText = document.querySelector('.transition-text');
+      const transitionSubtext = document.querySelector('.transition-subtext');
+      const transitionIcon = document.querySelector('.transition-icon');
+      
+      if (userType === 'guest') {
+        transitionText.textContent = 'Welcome, Guest!';
+        transitionSubtext.textContent = 'Exploring Torah reading practice...';
+        transitionIcon.textContent = '👀';
+      } else {
+        transitionText.textContent = 'Welcome to Your Journey!';
+        transitionSubtext.textContent = 'Preparing your Torah reading experience...';
+        transitionIcon.textContent = '🚀';
+      }
+      
+      // Start transition
+      landingPage.classList.add('transitioning');
+      transitionOverlay.classList.add('active');
+      
+      // After transition animation, switch to chat
+      setTimeout(() => {
+      landingPage.classList.add('hidden');
+        landingPage.classList.remove('transitioning');
+        chatContainer.classList.add('show', 'transitioning');
+        
+        // Hide transition overlay and show chat
+        setTimeout(() => {
+          transitionOverlay.classList.remove('active');
+          chatContainer.classList.remove('transitioning');
+        }, 100);
+      }, 1500);
+    }
+
+    function showChat() {
+      showTransitionAnimation('user');
+      currentUser = "User";
+      isLoggedIn = true;
+      guestInfo.style.display = 'none';
+      // Save login state
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('currentUser', currentUser);
+      if (chatData[currentChat].length === 0) {
+        renderMessages();
+      }
+    }
+
+    function showChatAsGuest() {
+      showTransitionAnimation('guest');
+      guestInfo.style.display = 'block';
+      currentUser = "Guest";
+      isLoggedIn = false;
+      // Save guest state
+      localStorage.setItem('isLoggedIn', 'false');
+      localStorage.setItem('currentUser', currentUser);
+      if (chatData[currentChat].length === 0) {
+        renderMessages();
+      }
+    }
+
+    function logout() {
+      // Clear login state
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('currentUser');
+      // Reset to landing page
+      landingPage.classList.remove('hidden');
+      chatContainer.classList.remove('show');
+      guestInfo.style.display = 'none';
+      currentUser = "Guest";
+      isLoggedIn = false;
+      // Close any open modals
+      settingsModal.classList.remove('active');
+      chatSidebarModal.classList.remove('active');
+      // Reinitialize animations
+      setTimeout(initializeScrollAnimations, 100);
+    }
+
+    function deleteAccount() {
+      if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+        // Clear all user data
+        localStorage.clear();
+        // Reset to landing page
+        landingPage.classList.remove('hidden');
+        chatContainer.classList.remove('show');
+        guestInfo.style.display = 'none';
+        currentUser = "Guest";
+        isLoggedIn = false;
+        // Reset chat data
+        Object.keys(chatData).forEach(key => {
+          if (key !== 'chat-1') delete chatData[key];
+        });
+        chatData['chat-1'] = [];
+        currentChat = 'chat-1';
+        // Close any open modals
+        settingsModal.classList.remove('active');
+        chatSidebarModal.classList.remove('active');
+        // Reload settings and re-render
+        loadSettings();
+        renderChatList();
+        renderMessages();
+        // Reinitialize animations
+        setTimeout(initializeScrollAnimations, 100);
+      }
+    }
+
+    // Check for existing login state on page load
+    function checkLoginState() {
+      const savedLoginState = localStorage.getItem('isLoggedIn');
+      const savedUser = localStorage.getItem('currentUser');
+      
+      if (savedLoginState === 'true' && savedUser) {
+        // User was logged in, restore their session
+        currentUser = savedUser;
+        isLoggedIn = true;
+        landingPage.classList.add('hidden');
+        chatContainer.classList.add('show');
+        if (savedUser === 'Guest') {
+          guestInfo.style.display = 'block';
+        } else {
+          guestInfo.style.display = 'none';
+        }
+        renderMessages();
+      }
+    }
+
+    // Add event listeners for logout and delete account
+    document.getElementById('logoutBtn').onclick = logout;
+    document.getElementById('deleteAccountBtn').onclick = deleteAccount;
+
+    landingLoginBtn.onclick = showChat;
+    landingSignupBtn.onclick = showChat;
+    landingGuestBtn.onclick = showChatAsGuest;
+
+    // Translation functions
+    function translatePage(language) {
+      currentLanguage = language;
+      const t = translations[language];
+      
+      // Update landing page content
+      const landingTitle = document.querySelector('.landing-title');
+      const landingSubtitle = document.querySelector('.landing-subtitle');
+      const bibleSectionTitle = document.querySelector('.bible-section h2');
+      
+      if (landingTitle) landingTitle.textContent = t.title;
+      if (landingSubtitle) landingSubtitle.innerHTML = t.subtitle.replace(/\n/g, '<br>');
+      if (bibleSectionTitle) bibleSectionTitle.textContent = t.discoverTorah;
+      
+      // Update Bible image descriptions
+      const descriptions = document.querySelectorAll('.bible-description');
+      if (descriptions[0]) descriptions[0].innerHTML = t.torahScroll.replace(/\n/g, '<br>');
+      if (descriptions[1]) descriptions[1].innerHTML = t.starOfDavid.replace(/\n/g, '<br>');
+      if (descriptions[2]) descriptions[2].innerHTML = t.menorah.replace(/\n/g, '<br>');
+      if (descriptions[3]) descriptions[3].innerHTML = t.hebrewText.replace(/\n/g, '<br>');
+      
+      // Update content sections
+      const sectionTitles = document.querySelectorAll('.section-title');
+      const sectionContents = document.querySelectorAll('.section-content');
+      
+      if (sectionTitles[0]) sectionTitles[0].textContent = t.whatIsBarMitzvah;
+      if (sectionContents[0]) sectionContents[0].textContent = t.barMitzvahDesc;
+      
+      if (sectionTitles[1]) sectionTitles[1].textContent = t.torahPractice;
+      if (sectionContents[1]) sectionContents[1].textContent = t.torahPracticeDesc;
+      
+      if (sectionTitles[2]) sectionTitles[2].textContent = t.significance;
+      if (sectionContents[2]) sectionContents[2].textContent = t.significanceDesc;
+      
+      if (sectionTitles[3]) sectionTitles[3].textContent = t.learningJourney;
+      if (sectionContents[3]) sectionContents[3].textContent = t.learningJourneyDesc;
+      
+      if (sectionTitles[4]) sectionTitles[4].textContent = t.community;
+      if (sectionContents[4]) sectionContents[4].textContent = t.communityDesc;
+      
+      // Update feature cards
+      const featureTitles = document.querySelectorAll('.feature-title');
+      const featureDescriptions = document.querySelectorAll('.feature-description');
+      
+      if (featureTitles[0]) featureTitles[0].textContent = t.cantillation;
+      if (featureDescriptions[0]) featureDescriptions[0].textContent = t.cantillationDesc;
+      if (featureTitles[1]) featureTitles[1].textContent = t.pronunciation;
+      if (featureDescriptions[1]) featureDescriptions[1].textContent = t.pronunciationDesc;
+      if (featureTitles[2]) featureTitles[2].textContent = t.torahPortions;
+      if (featureDescriptions[2]) featureDescriptions[2].textContent = t.torahPortionsDesc;
+      
+      if (featureTitles[3]) featureTitles[3].textContent = t.progressTracking;
+      if (featureDescriptions[3]) featureDescriptions[3].textContent = t.progressDesc;
+      if (featureTitles[4]) featureTitles[4].textContent = t.personalizedPractice;
+      if (featureDescriptions[4]) featureDescriptions[4].textContent = t.personalizedDesc;
+      if (featureTitles[5]) featureTitles[5].textContent = t.achievementSystem;
+      if (featureDescriptions[5]) featureDescriptions[5].textContent = t.achievementDesc;
+      
+      // Update finale section
+      const finaleTitle = document.querySelector('.finale-title');
+      const finaleSubtitle = document.querySelector('.finale-subtitle');
+      const loginBtn = document.getElementById('landingLoginBtn');
+      const signupBtn = document.getElementById('landingSignupBtn');
+      const guestBtn = document.getElementById('landingGuestBtn');
+      
+      if (finaleTitle) finaleTitle.textContent = t.readyToBegin;
+      if (finaleSubtitle) finaleSubtitle.textContent = t.readyDesc;
+      if (loginBtn) loginBtn.textContent = t.logIn;
+      if (signupBtn) signupBtn.textContent = t.signUp;
+      if (guestBtn) guestBtn.textContent = t.tryGuest;
+      
+      // Update chat interface
+      const chatHeader = document.querySelector('.chat-header');
+      const messageInput = document.getElementById('messageInput');
+      const sendButton = document.getElementById('sendButton');
+      const guestInfo = document.getElementById('guestInfo');
+      
+      if (chatHeader) chatHeader.textContent = t.chatHeader;
+      if (messageInput) messageInput.placeholder = t.messagePlaceholder;
+      if (sendButton) sendButton.textContent = t.sendButton;
+      if (guestInfo) guestInfo.textContent = t.loggedInAs;
+      
+      // Update settings
+      const settingsTitle = document.querySelector('.settings-panel h2');
+      const themeSelect = document.getElementById('themeSelect');
+      const resetBtn = document.getElementById('resetDefaultsBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const deleteBtn = document.getElementById('deleteAccountBtn');
+      
+      if (settingsTitle) settingsTitle.textContent = t.settingsTitle;
+      if (themeSelect) {
+        themeSelect.options[0].text = t.lightTheme;
+        themeSelect.options[1].text = t.darkTheme;
+      }
+      if (resetBtn) resetBtn.textContent = t.resetDefaults;
+      if (logoutBtn) logoutBtn.textContent = t.logout;
+      if (deleteBtn) deleteBtn.textContent = t.deleteAccount;
+      
+      // Update chat sidebar
+      const chatsTitle = document.querySelector('.chat-sidebar-title');
+      const newChatBtn = document.getElementById('addChatBtn');
+      
+      if (chatsTitle) chatsTitle.textContent = t.chatsTitle;
+      if (newChatBtn) newChatBtn.textContent = t.newChat;
+      
+      // Update transition messages
+      const transitionText = document.querySelector('.transition-text');
+      const transitionSubtext = document.querySelector('.transition-subtext');
+      if (transitionText) {
+        transitionText.textContent = t.welcomeJourney;
+        transitionSubtext.textContent = t.preparingExperience;
+      }
+      
+      // Re-render messages to update empty state
+      if (typeof renderMessages === 'function') {
+        renderMessages();
+      }
+      
+      // Save language preference
+      localStorage.setItem('language', language);
+    }
+
+    // Language selector functionality
+    const languageBtn = document.getElementById('languageBtn');
+    const languageDropdown = document.getElementById('languageDropdown');
+    const currentFlag = document.getElementById('currentFlag');
+    const currentLanguageSpan = document.getElementById('currentLanguage');
+    
+    // Landing page language selector
+    const landingLanguageBtn = document.getElementById('landingLanguageBtn');
+    const landingLanguageDropdown = document.getElementById('landingLanguageDropdown');
+    const landingCurrentFlag = document.getElementById('landingCurrentFlag');
+    const landingCurrentLanguageSpan = document.getElementById('landingCurrentLanguage');
+    
+    const languageFlags = {
+      'en': '🇺🇸',
+      'he': '🇮🇱',
+      'es': '🇪🇸',
+      'zh': '🇨🇳',
+      'ja': '🇯🇵'
+    };
+    
+    const languageNames = {
+      'en': 'English',
+      'he': 'עברית',
+      'es': 'Español',
+      'zh': '中文',
+      'ja': '日本語'
+    };
+
+    // Chat page language selector
+    if (languageBtn) {
+      languageBtn.addEventListener('click', () => {
+        languageDropdown.classList.toggle('active');
+      });
+    }
+
+    // Landing page language selector
+    if (landingLanguageBtn) {
+      landingLanguageBtn.addEventListener('click', () => {
+        landingLanguageDropdown.classList.toggle('active');
+      });
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.language-selector')) {
+        if (languageDropdown) languageDropdown.classList.remove('active');
+        if (landingLanguageDropdown) landingLanguageDropdown.classList.remove('active');
+      }
+    });
+
+    // Handle language selection
+    document.querySelectorAll('.language-option').forEach(option => {
+      option.addEventListener('click', () => {
+        const lang = option.getAttribute('data-lang');
+        
+        // Update active state for all language options
+        document.querySelectorAll('.language-option').forEach(opt => opt.classList.remove('active'));
+        option.classList.add('active');
+        
+        // Update both language selector buttons
+        if (currentFlag) currentFlag.textContent = languageFlags[lang];
+        if (currentLanguageSpan) currentLanguageSpan.textContent = languageNames[lang];
+        if (landingCurrentFlag) landingCurrentFlag.textContent = languageFlags[lang];
+        if (landingCurrentLanguageSpan) landingCurrentLanguageSpan.textContent = languageNames[lang];
+        
+        // Translate page
+        translatePage(lang);
+        
+        // Close both dropdowns
+        if (languageDropdown) languageDropdown.classList.remove('active');
+        if (landingLanguageDropdown) landingLanguageDropdown.classList.remove('active');
+      });
+    });
+
+    // Load saved language preference
+    const savedLanguage = localStorage.getItem('language') || 'en';
+    translatePage(savedLanguage);
+    
+    // Update language selectors to show current language
+    const currentOption = document.querySelector(`[data-lang="${savedLanguage}"]`);
+    if (currentOption) {
+      document.querySelectorAll('.language-option').forEach(opt => opt.classList.remove('active'));
+      currentOption.classList.add('active');
+      if (currentFlag) currentFlag.textContent = languageFlags[savedLanguage];
+      if (currentLanguageSpan) currentLanguageSpan.textContent = languageNames[savedLanguage];
+      if (landingCurrentFlag) landingCurrentFlag.textContent = languageFlags[savedLanguage];
+      if (landingCurrentLanguageSpan) landingCurrentLanguageSpan.textContent = languageNames[savedLanguage];
+    }
+
+    // Check login state on page load
+    checkLoginState();
+
+    // Scroll-triggered animation system
+    let animationObserver;
+    
+    function initializeScrollAnimations() {
+      const landingPage = document.getElementById('landingPage');
+      if (landingPage.classList.contains('hidden')) return;
+
+      // Reset all animations
+      document.querySelectorAll('.landing-subtitle, .bible-section, .bible-image-container, .landing-buttons').forEach(el => {
+        el.classList.remove('animate');
+      });
+
+      // Create intersection observer for scroll-triggered animations
+      animationObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const element = entry.target;
+            
+            if (element.classList.contains('landing-subtitle')) {
+              // Animate subtitle immediately
+              element.classList.add('animate');
+            } else if (element.classList.contains('bible-section')) {
+              // Animate bible section
+              element.classList.add('animate');
+              
+              // Animate individual bible images with stagger
+              const bibleImageContainers = element.querySelectorAll('.bible-image-container');
+              bibleImageContainers.forEach((container, index) => {
+                setTimeout(() => {
+                  container.classList.add('animate');
+                }, 300 + (index * 200));
+              });
+            } else if (element.classList.contains('content-section')) {
+              // Animate content sections
+              element.classList.add('animate');
+              
+              // Animate feature cards with stagger if they exist
+              const featureCards = element.querySelectorAll('.feature-card');
+              featureCards.forEach((card, index) => {
+                setTimeout(() => {
+                  card.classList.add('animate');
+                }, 200 + (index * 150));
+              });
+            } else if (element.classList.contains('landing-buttons')) {
+              // Animate buttons with grand entrance
+              element.classList.add('animate');
+            }
+          }
+        });
+      }, {
+        threshold: 0.3,
+        rootMargin: '0px 0px -50px 0px'
+      });
+
+      // Observe elements for scroll animations
+      const subtitle = document.querySelector('.landing-subtitle');
+      const bibleSection = document.querySelector('.bible-section');
+      const contentSections = document.querySelectorAll('.content-section');
+      const buttons = document.querySelector('.landing-buttons');
+      
+      if (subtitle) animationObserver.observe(subtitle);
+      if (bibleSection) animationObserver.observe(bibleSection);
+      contentSections.forEach(section => animationObserver.observe(section));
+      if (buttons) animationObserver.observe(buttons);
+    }
+
+    // Initialize animations when landing page is shown
+    const landingPageElement = document.getElementById('landingPage');
+    
+    // Initialize animations on page load if landing page is visible
+    if (!landingPageElement.classList.contains('hidden')) {
+      setTimeout(initializeScrollAnimations, 100);
+    }
+  </script>
+</body>
+</html>
